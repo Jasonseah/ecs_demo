@@ -1,0 +1,128 @@
+{
+    "taskDefinitionArn": "arn:aws:ecs:ap-southeast-1:547968355465:task-definition/laravel-nginx:16",
+    "containerDefinitions": [
+        {
+            "name": "nginx",
+            "image": "",
+            "cpu": 0,
+            "memory": 512,
+            "memoryReservation": 256,
+            "links": [
+                "laravel"
+            ],
+            "portMappings": [
+                {
+                    "name": "nginx-80-tcp",
+                    "containerPort": 80,
+                    "hostPort": 0,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "workingDirectory": "/var/www",
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-create-group": "true",
+                    "awslogs-group": "/ecs/",
+                    "awslogs-region": "ap-southeast-1",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            }
+        },
+        {
+            "name": "laravel",
+            "image": "",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "name": "laravel-9000-tcp",
+                    "containerPort": 9000,
+                    "hostPort": 0,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": false,
+            "environment": [
+                {
+                    "name": "API_KEY",
+                    "value": "${API_KEY}"
+                },
+                {
+                    "name": "MONGO_URL",
+                    "value": "${MONGO_URL}"
+                }
+            ],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "workingDirectory": "/var/www",
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-create-group": "true",
+                    "awslogs-group": "/ecs/laravel-nginx",
+                    "awslogs-region": "ap-southeast-1",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            }
+        }
+    ],
+    "family": "laravel-nginx",
+    "taskRoleArn": "arn:aws:iam::547968355465:role/CdkStack-TaskDefinitionTaskRoleFD40A61D-UTVY6XKDA2SM",
+    "executionRoleArn": "arn:aws:iam::547968355465:role/CdkStack-TaskDefinitionTaskRoleFD40A61D-UTVY6XKDA2SM",
+    "networkMode": "bridge",
+    "revision": 16,
+    "volumes": [],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+        {
+            "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+        },
+        {
+            "name": "ecs.capability.execution-role-awslogs"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.ecr-auth"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.17"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.21"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.task-iam-role"
+        },
+        {
+            "name": "ecs.capability.execution-role-ecr-pull"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.29"
+        }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EC2"
+    ],
+    "requiresCompatibilities": [
+        "EC2"
+    ],
+    "cpu": "1024",
+    "memory": "1024",
+    "runtimePlatform": {
+        "cpuArchitecture": "X86_64",
+        "operatingSystemFamily": "LINUX"
+    },
+    "registeredAt": "2023-08-13T13:13:57.615Z",
+    "registeredBy": "arn:aws:iam::547968355465:root",
+    "tags": []
+}
