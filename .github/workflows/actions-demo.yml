@@ -7,7 +7,7 @@ on:
 
 env:
   AWS_REGION: ap-southeast-1
-  ECR_REPOSITORY: 547968355465.dkr.ecr.ap-southeast-1.amazonaws.com/cdk-hnb659fds-container-assets-547968355465-ap-southeast-1
+  ECR_REPOSITORY: cdk-hnb659fds-container-assets-547968355465-ap-southeast-1
   # set this to your Amazon ECS service name
   ECS_SERVICE: nginx-laravel
   # set this to your Amazon ECS cluster name
