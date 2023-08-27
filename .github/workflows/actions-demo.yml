@@ -44,6 +44,17 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@62f4f872db3836360b72999f4b87f1ff13310f3a
 
+      - name: Fetch latest nginx image tag
+        id: fetch-nginx-tag
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          IMAGE_URI=$ECR_REGISTRY/$NGINX_ECR_REPOSITORY  # Replace with your ECR repository URI
+          LATEST_TAG=$(aws ecr describe-images --repository-name $IMAGE_URI --query 'images|sort_by(@, &imagePushedAt)|[-1].imageTags[0]' --output text)
+          echo "Latest image tag: $LATEST_TAG"
+          echo "Latest image uri: $ECR_REGISTRY/$ECR_REPOSITORY:$LATEST_TAG"
+          echo "::set-output name=nginx_latest_image_uri::$ECR_REGISTRY/$ECR_REPOSITORY:$LATEST_TAG"
+
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
         env:
@@ -57,17 +68,6 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-      - name: Fetch latest nginx image tag
-        id: fetch-nginx-tag
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        run: |
-          IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY  # Replace with your ECR repository URI
-          LATEST_TAG=$(aws ecr describe-images --repository-name $IMAGE_URI --query 'images|sort_by(@, &imagePushedAt)|[-1].imageTags[0]' --output text)
-          echo "Latest image tag: $LATEST_TAG"
-          echo "Latest image uri: $ECR_REGISTRY/$ECR_REPOSITORY:$LATEST_TAG"
-          echo "::set-output name=nginx_latest_image_uri::$ECR_REGISTRY/$ECR_REPOSITORY:$LATEST_TAG"
-
       - name: Fill in the nginx image ID in the Amazon ECS task definition
         id: nginx-task-def
         env:
@@ -75,7 +75,7 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
         with:
-          task-definition: ${{ env.ECS_TASK_DEFINITION }}g
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
           container-name: ${{ env.NGINX_CONTAINER_NAME }}
           image: ${{ env.NGINX_LATEST_IMAGE_URI }}
 
