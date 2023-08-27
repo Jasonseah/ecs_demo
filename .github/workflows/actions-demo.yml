@@ -67,6 +67,7 @@ jobs:
           image: ${{ steps.build-image.outputs.image }}
 
       - name: Echo Updated Task Definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@df9643053eda01f169e64a0e60233aacca83799a
         run: |
           cat {{steps.task-def.outputs.task-definition}}
 
