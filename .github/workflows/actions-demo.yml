@@ -18,6 +18,7 @@ env:
   MAIN_CONTAINER_NAME: laravel
   # set this to the nginx name of the container in the task definition
   NGINX_CONTAINER_NAME: nginx
+  NGINX_ECR_REPOSITORY: nginx
 
 permissions:
   contents: read
@@ -56,11 +57,33 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
+      - name: Fetch latest nginx image tag
+        id: fetch-nginx-tag
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY  # Replace with your ECR repository URI
+          LATEST_TAG=$(aws ecr describe-images --repository-name $IMAGE_URI --query 'images|sort_by(@, &imagePushedAt)|[-1].imageTags[0]' --output text)
+          echo "Latest image tag: $LATEST_TAG"
+          echo "Latest image uri: $ECR_REGISTRY/$ECR_REPOSITORY:$LATEST_TAG"
+          echo "::set-output name=nginx_latest_image_uri::$ECR_REGISTRY/$ECR_REPOSITORY:$LATEST_TAG"
+
+      - name: Fill in the nginx image ID in the Amazon ECS task definition
+        id: nginx-task-def
+        env:
+          NGINX_LATEST_IMAGE_URI: ${{ steps.fetch-nginx-tag.outputs.nginx_latest_image_uri }}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}g
+          container-name: ${{ env.NGINX_CONTAINER_NAME }}
+          image: ${{ env.NGINX_LATEST_IMAGE_URI }}
+
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
         with:
-          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          task-definition: ${{ steps.nginx-task-def.outputs.task-definition }}
           container-name: ${{ env.MAIN_CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
 
