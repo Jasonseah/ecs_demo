@@ -52,8 +52,8 @@ jobs:
           REPO_NAME=$NGINX_ECR_REPOSITORY  # Replace with your ECR repository URI
           LATEST_TAG=$(aws ecr describe-images --repository-name $REPO_NAME --query 'imageDetails|sort_by(@, &imagePushedAt)|[-1].imageTags[0]' --output text)
           echo "Latest image tag: $LATEST_TAG"
-          echo "Latest image uri: $ECR_REGISTRY/$ECR_REPOSITORY:$LATEST_TAG"
-          echo "::set-output name=nginx_latest_image_uri::$ECR_REGISTRY/$ECR_REPOSITORY:$LATEST_TAG"
+          echo "Latest image uri: $ECR_REGISTRY/$NGINX_ECR_REPOSITORY:$LATEST_TAG"
+          echo "::set-output name=nginx_latest_image_uri::$ECR_REGISTRY/$NGINX_ECR_REPOSITORY:$LATEST_TAG"
 
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
