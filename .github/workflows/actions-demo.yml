@@ -9,7 +9,7 @@ env:
   AWS_REGION: ap-southeast-1
   ECR_REPOSITORY: cdk-hnb659fds-container-assets-547968355465-ap-southeast-1
   # set this to your Amazon ECS service name
-  ECS_SERVICE: nginx-laravel
+  ECS_SERVICE: laravel-nginx
   # set this to your Amazon ECS cluster name
   ECS_CLUSTER: CdkStack-ClusterEB0386A7-1nlzeEjdMlw5
   # set this to the path to your Amazon ECS task definition
@@ -19,10 +19,8 @@ env:
   # set this to the nginx name of the container in the task definition
   NGINX_CONTAINER_NAME: nginx
 
-
-defaults:
-  run:
-    shell: bash
+permissions:
+  contents: read
 
 jobs:
   deploy:
@@ -65,10 +63,6 @@ jobs:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
           container-name: ${{ env.MAIN_CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
-
-      #      - name: Echo Updated Task Definition
-      #        run: |
-      #          cat {{steps.task-def.outputs.task-definition}}
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@df9643053eda01f169e64a0e60233aacca83799a

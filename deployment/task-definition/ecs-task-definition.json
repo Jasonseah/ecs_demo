@@ -3,7 +3,7 @@
     "containerDefinitions": [
         {
             "name": "nginx",
-            "image": "",
+            "image": "547968355465.dkr.ecr.ap-southeast-1.amazonaws.com/nginx:13082023",
             "cpu": 0,
             "memory": 512,
             "memoryReservation": 256,
